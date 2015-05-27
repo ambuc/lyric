@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title> IndieSingerSongwriter.exe </title>
+
+    <!-- Bootstrap -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+    
+	<link href='http://fonts.googleapis.com/css?family=Merriweather:400,300italic,700,300' rel='stylesheet' type='text/css'>
+
+    
+	<style>
+		body{ font-family: 'Merriweather', serif; }
+		#title{
+			font-style: italic;
+			text-transform: uppercase;
+		}
+	</style>
+
+  </head>
+  <body>
+  	<div class = "container">
+		<div class="page-header">
+		    <button type="button" class="btn btn-info btn-lr pull-right" id="refresh">
+				<span class="glyphicon glyphicon-refresh"></span> Refresh
+			</button>
+			<h1 id = "title"></h1>
+		    <h4> <small>by <a href = "../index.html">James Buckland</a> </small> </h4>
+		</div>
+  	</div>
+  	<div class = "container">
+  		  
+  		<dl class="dl-horizontal" id="poem">
+			<div class = "verse" id="verse1"></div>
+			<div class = "bridge" id="bridge1"></div>
+			<div class = "chorus" id="chorus1"></div>
+			<div class = "verse" id="verse2"></div>
+			<div class = "bridge" id="bridge2"></div>
+			<div class = "chorus" id="chorus2"></div>
+			<div class = "verse" id="verse3"></div>
+		</dl>
+  
+  	</div>
+  	<div class = "container">
+		
+  	</div>
+ 	
+    <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+	<script type="text/javascript" charset="utf-8">
+		$(document).ready(function() {
+			var file = "lyric.txt"
+			
+    	   $.getJSON( file, function( json ) {
+    	   		var firsts = json[1][1];
+    	   		var markov = json[0];
+    	   					
+				function getFirst(){
+					return firsts[Math.floor(Math.random()*firsts.length)];
+				}
+				
+				function getNext(str){
+					return markov[str][Math.floor(Math.random()*markov[str].length)];
+				}
+				
+				function makeLine(num){
+					var result = "";
+					var current = getFirst();
+					for (var i = 0; i < num; i++){
+						var next = getNext(current);
+						result += current + " ";
+						current = next;
+					}
+					return result;
+				}
+				
+				function makeSection(arr){
+					var result = "";
+					for(var i = 0; i < arr.length; i++){
+						result += makeLine(arr[i]) + "<br/>";
+					}
+					return result + "<br/>";
+				}
+				
+				function getRandomInt(min, max) {
+				    return Math.floor(Math.random() * (max - min + 1)) + min;
+				}
+				
+				function makeStruct(num, min, max){
+					var arr = [];
+					for(var i = 0; i < num; i++){
+						arr.push(getRandomInt(min, max));
+					}
+					return arr;
+				}
+				
+				function makeScheme(){
+					var structure = {
+						numVerse1  : getRandomInt(1, 1),    				
+					    numBridge1 : getRandomInt(1, 1),
+					    numChorus1 : getRandomInt(1, 2),
+					    numVerse2  : getRandomInt(0, 1),
+					    numBridge2 : getRandomInt(0, 1),
+					    numChorus2 : getRandomInt(1, 2),
+					    numVerse3  : getRandomInt(0, 1),
+					    arrVerse   : makeStruct(getRandomInt(3, 5), 4, 8),
+					    arrBridge  : makeStruct(getRandomInt(2, 4), 2, 8),
+					    arrChorus  : makeStruct(4, 5, 10)
+					};
+					return structure;
+				}
+				
+				var structure = makeScheme();
+				
+				$("#title").html(makeLine(getRandomInt(2, 5)));
+				
+				var chorus = makeSection(structure.arrChorus)
+				
+				function makeVerse(){
+					$("#poem").append("<dt>Verse</dt> <dd> " + makeSection(structure.arrVerse) + "</dd>");
+				}
+				
+				function makeBridge(){
+					$("#poem").append("<dt>Bridge</dt> <dd> " + makeSection(structure.arrBridge) + "</dd>");
+				}
+				
+				function makeChorus(){
+					$("#poem").append("<dt>Chorus</dt> <dd> " + chorus + "</dd>");
+				}
+				
+				for(var i = 0; i < structure.numVerse1;  i++){ makeVerse(); }
+				for(var i = 0; i < structure.numBridge1; i++){ makeBridge(); }
+				for(var i = 0; i < structure.numChorus1; i++){ makeChorus(); }
+				for(var i = 0; i < structure.numVerse2;  i++){ makeVerse(); }
+				for(var i = 0; i < structure.numBridge2; i++){ makeBridge(); }
+				for(var i = 0; i < structure.numChorus2; i++){ makeChorus(); }
+				for(var i = 0; i < structure.numVerse3;  i++){ makeVerse(); }
+							
+			});
+    	   
+			$('#refresh').click(function() {
+				location.reload();
+			});
+		});		
+	</script>
+    
+  </body>
+</html>
